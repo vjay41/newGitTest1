@@ -32,6 +32,23 @@ class ProgresDBConnection:
         if self.connection_pool:
             self.connection_pool.closeall()
 
+    def execute_select(self, sql_query):
+        conn = None
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            cursor.execute(sql_query)
+            columns = [desc[0] for desc in cursor.description]
+            data = cursor.fetchall()
+            cursor.close()
+            return pd.DataFrame(data, columns=columns)
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(f"Error: {error}")
+            return pd.DataFrame()
+        finally:
+            if conn:
+                self.put_connection(conn)
+    
     def execute_query(self, query):
         conn = None
         try:
