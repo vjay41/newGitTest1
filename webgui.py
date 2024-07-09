@@ -5,10 +5,14 @@ import time
 import tempfile
 import shutil
 import concurrent.futures
+import os
 
-# Function to create a temporary directory
-def create_temp_dir():
-    return tempfile.mkdtemp()
+# Function to create a temporary directory in the current project path
+def create_temp_dir_in_project():
+    project_path = os.path.dirname(os.path.abspath(__file__))  # Get current script's directory
+    temp_dir_path = os.path.join(project_path, 'temp_user_data')  # Path for temporary directory
+    os.makedirs(temp_dir_path, exist_ok=True)  # Create the directory if it doesn't exist
+    return temp_dir_path
 
 # Function to remove a temporary directory
 def remove_temp_dir(path):
@@ -17,13 +21,20 @@ def remove_temp_dir(path):
     except OSError as e:
         print(f"Error: {path} : {e.strerror}")
 
+# Function to locate Chrome WebDriver relative to script's directory
+def get_chromedriver_path():
+    project_path = os.path.dirname(os.path.abspath(__file__))  # Get current script's directory
+    driver_filename = 'chromedriver'  # Adjust for your WebDriver filename
+    driver_path = os.path.join(project_path, driver_filename)
+    return driver_path
+
 # Function to monitor a single URL
 def monitor_url(url):
-    # Replace with the path to your Chrome WebDriver for Linux
-    driver_path = '/path/to/chromedriver'
+    # Get Chrome WebDriver path relative to the script's directory
+    driver_path = get_chromedriver_path()
     
-    # Create a temporary user data directory
-    temp_user_data_dir = create_temp_dir()
+    # Create a temporary user data directory in the project path
+    temp_user_data_dir = create_temp_dir_in_project()
 
     # Set up Chrome options to use the temporary user data directory
     chrome_options = webdriver.ChromeOptions()
