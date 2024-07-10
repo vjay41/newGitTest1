@@ -1,0 +1,45 @@
+Step 1: Encrypt the Password
+First, encrypt the sensitive information (your_password) using Ansible Vault. Open a terminal and run the following command:
+
+bash
+Copy code
+ansible-vault encrypt_string --name 'api_password' 'your_password'
+
+
+Step 2: Modify the Playbook
+Modify your playbook (generate_token.yaml) to use the encrypted variable:
+
+yaml
+Copy code
+---
+- name: Generate Authentication Token
+  hosts: localhost  # or specify your target hosts
+
+  vars:
+    api_username: your_username
+    api_password: !vault |
+                  $ANSIBLE_VAULT;1.2;AES256;your_vault_encrypted_password
+    api_url: https://your-api-url/token
+
+  tasks:
+    - name: Make API Request to Generate Token
+      uri:
+        url: "{{ api_url }}"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+        body:
+          username: "{{ api_username }}"
+          password: "{{ api_password }}"
+      register: token_response
+
+    - name: Debug Token Response
+      debug:
+        var: token_response
+
+    # Optionally, save the token to a file or use it for further tasks.
+    # Example: Save token to a file
+    - name: Save Token to File
+      copy:
+        content: "{{ token_response.json.access_token }}"
+        dest: "/path/to/token.txt"
