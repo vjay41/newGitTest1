@@ -1,3 +1,6 @@
+tar -czvf "$(hostname)_$(date +%Y%m%d_%H%M%S)_netcool_logs.tar.gz" -C /opt/IBM/tivoli/netcool/log *.log *.log1
+
+
 Step 1: Encrypt the Password
 First, encrypt the sensitive information (your_password) using Ansible Vault. Open a terminal and run the following command:
 
