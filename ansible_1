@@ -1,0 +1,70 @@
+---
+- name: Execute script based on component type
+  hosts: localhost
+  vars_prompt:
+    - name: "component_type"
+      prompt: "Select the component type (nco_services, impact_services, webgui_service)"
+      private: no
+
+  tasks:
+    - name: Validate component type
+      fail:
+        msg: "Invalid component type selected. Choose from nco_services, impact_services, webgui_service."
+      when: component_type not in ['nco_services', 'impact_services', 'webgui_service']
+
+    - name: Upload backup_nco_services_logs.sh script
+      copy:
+        src: /local/path/to/backup_nco_services_logs.sh
+        dest: /home/nco/backup_nco_services_logs.sh
+        mode: '0755'
+      when: component_type == 'nco_services'
+
+    - name: Run backup_nco_services_logs.sh for nco_services
+      shell: /home/nco/backup_nco_services_logs.sh
+      when: component_type == 'nco_services'
+
+    - name: Run script for impact_services
+      shell: /path/to/impact_services_script.sh
+      when: component_type == 'impact_services'
+
+    - name: Run script for webgui_service
+      shell: /path/to/webgui_service_script.sh
+      when: component_type == 'webgui_service'
+
+
+
+
+---
+- name: Push and execute shell script
+  hosts: all
+  tasks:
+    - name: Copy shell script to remote host
+      ansible.builtin.copy:
+        src: ./scripts/my_script.sh
+        dest: /tmp/my_script.sh
+        mode: '0755'
+
+    - name: Execute shell script
+      ansible.builtin.shell: /tmp/my_script.sh
+      register: script_output
+      ignore_errors: yes
+
+    - name: Validate exit code
+      ansible.builtin.fail:
+        msg: "Script execution failed with exit code {{ script_output.rc }}"
+      when: script_output.rc != 0
+
+    - name: Validate output text
+      ansible.builtin.fail:
+        msg: "Unexpected script output: {{ script_output.stdout }}"
+      when: "'Hello, World!' not in script_output.stdout"
+      
+    - name: Print script output
+      ansible.builtin.debug:
+        msg: "Script output: {{ script_output.stdout }}"
+
+    - name: Remove shell script from remote host
+      ansible.builtin.file:
+        path: /tmp/my_script.sh
+        state: absent
+
