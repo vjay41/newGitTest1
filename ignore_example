@@ -1,0 +1,60 @@
+# IntelliJ IDEA specific files
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ansible
+*.retry
+inventory/*/host_vars/*
+inventory/*/group_vars/*
+group_vars/*
+host_vars/*
+*.log
+*.retry
+.vagrant/
+*.vault_pass
+*.vault_pass.txt
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.so
+.Python
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Ignore specific directories
+node_modules/
+dist/
+coverage/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Exclude .gitignore
+.gitignore
+
+# End of `.gitignore`
