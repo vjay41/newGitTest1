@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Define the nci_collect_logs command
+NCI_COMMAND="/apps/netcool/tivoli/bin/nci_collect_logs"
+
+# Execute the nci_collect_logs command
+$NCI_COMMAND
+
+# Check the exit status of the command
+if [ $? -eq 0 ]; then
+    echo "nci_collect_logs execution completed successfully."
+
+    # Find the most recent .zip file in the specified directory
+    RECENT_ZIP=$(ls -t /apps/netcool/tivoli/impact/tmp/*.zip 2>/dev/null | head -n 1)
+
+    if [ -n "$RECENT_ZIP" ]; then
+        echo "Most recent .zip file: $RECENT_ZIP"
+
+        # Get the hostname
+        HOSTNAME=$(hostname)
+
+        # Define the destination path with the hostname prefixed to the filename
+        BASENAME=$(basename "$RECENT_ZIP")
+        DESTINATION="/home/nco/${HOSTNAME}_${BASENAME}"
+
+        # Copy the file
+        cp "$RECENT_ZIP" "$DESTINATION"
+
+        if [ $? -eq 0 ]; then
+            echo "File copied to $DESTINATION successfully."
+
+            # Define the imcl command
+            IMCL_COMMAND="/netcool/bin/imcl listinstalledpackes -long > /home/nco/imcl.log"
+
+            # Execute the imcl command
+            $IMCL_COMMAND
+
+            # Check the exit status of the imcl command
+            if [ $? -eq 0 ]; then
+                echo "imcl command executed successfully and output saved to /home/nco/imcl.log."
+
+                # Add the imcl.log file to the zip file
+                zip -j "$DESTINATION" /home/nco/imcl.log
+
+                if [ $? -eq 0 ]; then
+                    echo "imcl.log added to $DESTINATION successfully."
+                else
+                    echo "Failed to add imcl.log to $DESTINATION."
+                fi
+            else
+                echo "Failed to execute imcl command."
+            fi
+        else
+            echo "Failed to copy the file."
+        fi
+    else
+        echo "No .zip files found in the directory."
+    fi
+else
+    echo "nci_collect_logs execution failed."
+fi
