@@ -1,0 +1,39 @@
+SELECT 
+    Identifier, 
+    Node, 
+    AlertGroup, 
+    AlertKey, 
+    Severity, 
+    COUNT(*) AS EventCount 
+FROM 
+    alerts.status 
+WHERE 
+    LastOccurrence > NOW() - INTERVAL 1 HOUR
+GROUP BY 
+    Identifier, 
+    Node, 
+    AlertGroup, 
+    AlertKey, 
+    Severity
+HAVING 
+    COUNT(*) > 10
+ORDER BY 
+    EventCount DESC;
+
+
+#!/bin/bash
+
+# Directory to check
+DIRECTORY="/apps/netcool"
+
+# Get the disk usage percentage of the specified directory
+usage=$(df -h $DIRECTORY | awk 'NR==2 {print $5}' | sed 's/%//')
+
+# Check if the usage exceeds 70%
+if [ "$usage" -gt 70 ]; then
+  echo "Disk space usage for $DIRECTORY is more than 70%. Current usage is ${usage}%."
+  exit 1
+else
+  echo "Disk space usage for $DIRECTORY is within limits. Current usage is ${usage}%."
+  exit 0
+fi
