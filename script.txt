@@ -42,11 +42,15 @@ fi
 
 #!/bin/bash
 
+# Get the hostname
+HOSTNAME=$(hostname)
+
 # Define the directory and the number of days
 TARGET_DIR="/home/nco"
 DAYS=30
 
-# Find and delete old .tar.gz files
-find "$TARGET_DIR" -type f -name "*.tar.gz" -mtime +$DAYS -exec rm -f {} \;
+# Find and delete old .tar.gz and .zip files prefixed with the hostname
+find "$TARGET_DIR" -type f \( -name "${HOSTNAME}*.tar.gz" -o -name "${HOSTNAME}*.zip" \) -mtime +$DAYS -exec rm -f {} \;
 
-echo "Old .tar.gz files older than $DAYS days have been deleted from $TARGET_DIR."
+echo "Old .tar.gz and .zip files older than $DAYS days, prefixed with $HOSTNAME, have been deleted from $TARGET_DIR."
+
