@@ -54,3 +54,21 @@ find "$TARGET_DIR" -type f \( -name "${HOSTNAME}*.tar.gz" -o -name "${HOSTNAME}*
 
 echo "Old .tar.gz and .zip files older than $DAYS days, prefixed with $HOSTNAME, have been deleted from $TARGET_DIR."
 
+
+
+
+
+
+#!/bin/bash
+
+# Get the hostname
+HOSTNAME=$(hostname)
+
+# Define the directory and the number of days
+TARGET_DIR="/home/nco"
+DAYS=30
+
+# Find and delete old .tar.gz and .zip files prefixed with the hostname
+find "$TARGET_DIR" -type f \( -name "${HOSTNAME}*.tar.gz" -o -name "${HOSTNAME}*.zip" \) -mtime +$DAYS -print -exec rm -f {} \;
+
+echo "Deletion complete. Listed above are the old .tar.gz and .zip files older than $DAYS days, prefixed with $HOSTNAME, that have been deleted from $TARGET_DIR."
