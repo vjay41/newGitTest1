@@ -37,3 +37,16 @@ else
   echo "Disk space usage for $DIRECTORY is within limits. Current usage is ${usage}%."
   exit 0
 fi
+
+
+
+#!/bin/bash
+
+# Define the directory and the number of days
+TARGET_DIR="/home/nco"
+DAYS=30
+
+# Find and delete old .tar.gz files
+find "$TARGET_DIR" -type f -name "*.tar.gz" -mtime +$DAYS -exec rm -f {} \;
+
+echo "Old .tar.gz files older than $DAYS days have been deleted from $TARGET_DIR."
